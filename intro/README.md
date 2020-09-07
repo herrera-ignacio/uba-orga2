@@ -110,7 +110,7 @@ Con los bloques de datos no hay mucho que hacer par ahorrar memoria. Pero en el 
 
 ### Intel da el golpe
 
-En 1978 se presenta la familia iAPx86 de la mano del procesador 8086. Intel se compromete a mantener compatibilidad ascendente y fue uno de los motivos por los que IBM decidió adoptar esta familia de procesadores como base para su PC.
+En 1978 se presenta la familia iAPx86 de la mano del procesador 8086 de 16 bits. Intel se compromete a mantener compatibilidad ascendente y fue uno de los motivos por los que IBM decidió adoptar esta familia de procesadores como base para su PC.
 
 ![8086 arquitectura](./arquitectura8086.png)
 
