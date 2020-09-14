@@ -1,5 +1,11 @@
 # Arquitectura x86, Procesadores IA-32
 
+* Historia
+* Modos de Operacion
+* Modelo del Programador de Aplicaciones
+* Tipos de Datos Fundamentales
+* Modos de Direccionamiento
+
 ## Historia
 
 * En 1984 Intel lanza el primer procesador de 32 bits, el 80386 con su arquitectura IA-32. Aparecen fabricantes que producirán procesadores IA'32 bajo licencia de Intel, entre ellos se destaca AMD.
@@ -127,3 +133,133 @@ Registros __independientes__ de 128 bits para procesamiento vectorial (__Data Le
 
 Se introdujeron con la llegada del __Pentium III__.
 
+### Arquitectura Intel 64 bts
+
+#### Extensiones de 64 bits
+
+![extension 64](./extension64.png)
+
+* 16 registros de proposito general de 64 bits, donde se extienden los 8 ya existentes registros cuya parte baja sigue funcionando como registros de 32 bits, y se agregan otros 8 registros (R8 a R15) de 64, que tambien pueden ser accesibles como registros de 16 y 8 bits.
+
+* El procesador, a pesar de estar en modo 64 bits, puede acceder a diferentes tamaños de operador utilizando el prefijo REX.
+
+* Espacio de direccionamiento de 0 a 2^64-1 (64 bytes).
+
+* La parte de la FPU, y MMX no cambia.
+
+* Se elevan los Registros XMM a 16 registros.
+
+#### Flags
+
+![flags](./flags.png)
+
+#### Como obtener operandos
+
+* Instruccion en si misma (operando implícito)
+* Registro
+* Posicion de memoria
+* Port de E/S
+
+## Tipos de Datos Fundamentales
+
+![tipos de datos](./tiposdatos.png)
+
+### Almacenamiento en Memoria
+
+#### Little Endian
+
+Una variable de varios bytes de tamaño, almacena su byte menos significativo en la dirección con la que referencia la variable, y a partir de allí coloca el resto de los bytes en órden ascendente de significancia, terminando con el almacenamiento del byte más significativo en la dirección de memoria más alta.
+
+A simple vista, pareciera que están almacenados "al revés", ya que si lo miramos en la memoria, está de atrás hacia adelante.
+
+![little endian](./littleendian.png)
+
+### Alineación de Memoria
+
+* Procesadores IA-32 e Intel 64 no ponen restricciones respecto de la alineación en memoria para diferentes variables de los programas, dando gran flexibilidad.
+* Si una variable queda repartida en dos filas diferentes, se requerirán dos ciclos de lectura para accederla, teniendo una pérdida de __performance__.
+* Esto puede evitarse usando directivas de alineación que todos los lenguajes poseen.
+
+![desalineado](./desalineado.png)
+
+## Modos de Direccionamiento
+
+* Implicito
+* Inmediato
+* A Registro
+* A Memoria
+* Base Directo
+* Base + Desplazamiento
+
+### Implicito
+
+Instruciones en las cuales el code op es suficiente como para establecer que operación realizar y cual es el operando (tambien aquellas que no requieren operandos).
+
+Ejemplos de este Modo, las instrucciones que operan sobre los flags:
+
+* CLC (Clear Carry), STC (Set Carry) y CMC (Complement Carry), donde el operando Flag CF esta implicito.
+
+* CLD (Clear Direction Flag) y STD (Set Direction Flag).
+
+* CLI y STI 
+
+### Inmediato
+
+Operando viene dentro del codigo de la instruccion.
+
+Un ejemplo es la suma.
+
+### A Registro
+
+Todos los operandos involucrados son Registros del procesador.
+
+### A memoria
+
+#### Espacio Fisico
+
+Los procesadores IA-32 organizan la memoria como una secuencia de bytes, direccionables a traves de su Bus de Address.
+
+La memoria conectada a este bus se denomina __memoria fisicia__.
+
+El espacio de direcciones que pueden volcarse sobre este bus se denomina __direcciones fisicas__.
+
+#### Segmentacion vs Paginacion
+
+![seg vs pag](./seg.png)
+
+Los segmentos se diferencian en:
+
+* Segmentos de tamaño variable.
+* Mucho mas flexible para definir segmentos proporcionales al tamaño de datos a guardar.
+* Solapamiento.
+* Discontinuidad.
+* Require mas control y complejidad.
+
+Por diversos motivos que en su momento tuvieron sentido, Intel definió organizar el espacio de direccinoamiento de la Familia iAPx86 en segmetos. El compromiso de compatibilidad ató a los siguientes procesadores a mantener este esquema.
+
+#### Espacio Lógico
+
+Condiciones iniciales de segmentación:
+
+* 4 registros de segmento para almacenar hasta 4 selectores de segment.
+* Registros de 16 bits, los segmentos tienen a lo sumo 64K de tamaño.
+* __Dirección lógica__: Expresión de las direcciones en el modelo de programación mediante dos valores, que se traduce a una dirección física (__Dirección Efectiva__):
+  * Identificador de segmento en el que se encuentra la variable o instrucción que se desea direccionar.
+  * Desplazamiento, offset, o __dirección efectiva__ a partir del inicio de ese segmento. Este offset se incluye en la instrucción como un valor en forma explícita.
+
+![dir efectiva](./direfectiva.png)
+
+### Base Directo
+
+En este modo el offset está contenido directamente en un registro Base. El procesador simplemente toma el offset desde el registro sin otro calculo.
+
+### Base + Desplazamiento
+
+Combina el valor contenido en un registro que apunta a la base de un bloque de datos con un valor explícito puesto en la instrucción (desplazamiento), que permite calcular la dirección efectiva.
+
+Tambien resulta útil para acceder a una estructura más compleja de datos, apuntando a la base de la estructura con un registro y utilizando el Desplazamiento para acceder al campo deseado de la estructura.
+
+#### Utilidad
+
+* Este modo es especial para acceder a matrices bidimensionales.
+* Un ejemplo obligado es el buffer de video.
